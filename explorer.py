@@ -2,7 +2,7 @@
 # AUTHOR:     stm
 # DATE:       23/06/13
 # PROJECT:    explorer.py
-# Version:    0.1
+# Version:    0.2
 #######################
 
 # Imports
@@ -13,12 +13,19 @@ from pygame.locals import *
 
 
 class Alien(pygame.sprite.Sprite):
+  ''' This class is the basis of our
+    hero Space Nigga' '''
   def __init__(self):
     pygame.sprite.Sprite.__init__(self)
-    self.image, self.rect = game.load_image("alien.bmp", -1)
+    self.image, self.rect = game.load_image("resources/alien.bmp", -1)
     self.screen = pygame.display.get_surface()
     self.area = self.screen.get_rect()
     self.rect.center = (self.rect.width/2+10, game.screen.get_height()-(self.rect.height/2)-10) 
+    self.sound = game.load_sound('../../../supportFiles/sounds/rocket.wav')
+    self.sound.set_volume(0.5)
+
+  def thrusters(self): 
+      self.move(0, -3)
 
   def move(self, dx, dy):
     self.rect = self.rect.move(dx, dy)
@@ -29,6 +36,10 @@ class GameEngine:
     and generating game objects as well as writing
     to the game screen and setup'''
   def main(self):
+    ''' This is the main game function
+      responsible for the creating of
+      all processes and characters.'''
+
     # Set the size of the screen
     self.height = 400 
     self.width = 700
@@ -51,6 +62,9 @@ class GameEngine:
     clock = pygame.time.Clock()
     keydown = False
 
+    # Set the variable for the alien's default position
+    alienHome = game.screen.get_height()-(alien.rect.height/2)-10
+
     # Event loop to keep track of
     # what is happening
     while True:
@@ -60,12 +74,26 @@ class GameEngine:
           sys.exit(0)
         if event.type == KEYDOWN:
           if event.dict['key'] == 32:
-            alien.move(0,-3)
+            alien.thrusters()
+            alien.sound.play(-1)
             keydown = True
         if event.type == KEYUP:
           keydown = False
-      if not keydown and alien.rect.center[1] != game.screen.get_height()-(alien.rect.height/2)-10:
-        alien.move(0,2)
+          alien.sound.fadeout(200)
+
+
+      # This piece of logic deals with the gravity of the game.
+      # When the key is not pressed i.e. when thrusters are 
+      # disabled and the alien isn't in the home position
+      # it is falling. We encountered a bug here in that the
+      # alien would miss the landing spot and fall forever
+      # but we fixed that using the > clause.
+      if not keydown and alien.rect.center[1] != alienHome:
+        moveDis = 2
+        if alien.rect.center[1] > alienHome:
+          alien.move(0, alienHome - alien.rect.center[1])
+          modeDis = 0
+        alien.move(0,moveDis)
       elif keydown:
         alien.move(0,-3)
 
@@ -91,6 +119,19 @@ class GameEngine:
         colorkey = image.get_at((0,0))
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
+
+  def load_sound(self,sound):
+    class NoneSound():
+      def play(): pass
+    if not pygame.mixer:
+      return NoneSound()
+    try: 
+      sound =  pygame.mixer.Sound(sound)
+    except pygame.error, message:
+      sys.stderr.write('Cannot open file',wav)
+      raise SystemExit, message
+    return sound
+
 
 
 if __name__ == "__main__":
