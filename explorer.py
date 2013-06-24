@@ -49,7 +49,7 @@ class GameEngine:
     alien = Alien()
     allsprites = pygame.sprite.RenderPlain((alien))
     clock = pygame.time.Clock()
-    dropNow = 0
+    keydown = False
 
     # Event loop to keep track of
     # what is happening
@@ -60,10 +60,15 @@ class GameEngine:
           sys.exit(0)
         if event.type == KEYDOWN:
           if event.dict['key'] == 32:
-            alien.move(15,-15)
-            dropNow = 15
-      if alien.rect.center[1] != game.screen.get_height()-(alien.rect.height/2)-10:
-        alien.move(0,1)
+            alien.move(0,-3)
+            keydown = True
+        if event.type == KEYUP:
+          keydown = False
+      if not keydown and alien.rect.center[1] != game.screen.get_height()-(alien.rect.height/2)-10:
+        alien.move(0,2)
+      elif keydown:
+        alien.move(0,-3)
+
 
       # Update the images on screen ensure they
       # also persist
