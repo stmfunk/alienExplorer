@@ -11,6 +11,20 @@ import pygame
 import os
 from pygame.locals import *
 
+class Obstacle(pygame.sprite.Sprite):
+  '''This is a generic class for building
+    clouds, walls and other objects that
+    move across the screen at some rate.'''
+  def __init__(self, size, location):
+    pygame.sprite.Sprite.__init__(self)
+    self.image = pygame.Surface(size)
+    self.image.fill((0,0,0))
+    self.rect = self.image.get_rect()
+    self.rect.center = location
+
+  def move(self):
+    self.rect.center = (self.rect.center[0]-1,self.rect.center[1])
+
 
 class Alien(pygame.sprite.Sprite):
   ''' This class is the basis of our
@@ -58,7 +72,8 @@ class GameEngine:
     self.screen.blit(background, (0,0))
     pygame.display.flip()
     alien = Alien()
-    allsprites = pygame.sprite.RenderPlain((alien))
+    obstacle = Obstacle((50,50),(self.width,self.height/2))
+    allsprites = pygame.sprite.RenderPlain((alien, obstacle))
     clock = pygame.time.Clock()
     keydown = False
 
@@ -80,6 +95,7 @@ class GameEngine:
         if event.type == KEYUP:
           keydown = False
           alien.sound.fadeout(200)
+      obstacle.move()
 
 
       # This piece of logic deals with the gravity of the game.
