@@ -14,21 +14,30 @@ from pygame.locals import *
 class Obstacle(pygame.sprite.Sprite):
   '''This is a generic class for building
     clouds, walls and other objects that
-    move across the screen at some rate.'''
-  def __init__(self, size, location):
+    move across the screen at some rate.
+    
+    This is only designed for objects that
+    move from right to left, as all of our
+    player interacting objects behave in
+    this way.'''
+  def __init__(self, scale=2, zLevel=0, location, image="resources/Cloud.bmp"):
     pygame.sprite.Sprite.__init__(self)
-    self.image = pygame.Surface(size)
-    self.image.fill((0,0,0))
+    temp = game.load_image(image, -1)
+    temp = (pygame.transform.scale(temp[0],(temp[0].get_width()/scale,temp[0].get_height()/scale)), temp[1])
+    self.image, self.rect = temp
     self.rect = self.image.get_rect()
     self.rect.center = location
 
   def move(self):
-    self.rect.center = (self.rect.center[0]-1,self.rect.center[1])
+    if self.rect.center[0] < -(self.rect.width) or self.rect.center[1] < -(self.rect.height):
+      return False
+    self.rect.center = (self.rect.center[0]-3,self.rect.center[1])
+    return True
 
 
 class Alien(pygame.sprite.Sprite):
   ''' This class is the basis of our
-    hero Space Nigga' '''
+    hero Space Nigga' This is z-level 1'''
   def __init__(self):
     pygame.sprite.Sprite.__init__(self)
     self.image, self.rect = game.load_image("resources/alien.bmp", -1)
@@ -71,11 +80,16 @@ class GameEngine:
     background.fill((200,200,200))
     self.screen.blit(background, (0,0))
     pygame.display.flip()
+
+    # Create the obstacles
+    obstacles = []
+    obstacles.append(Obstacle((self.width,self.height/2)))
+
     alien = Alien()
-    obstacle = Obstacle((50,50),(self.width,self.height/2))
-    allsprites = pygame.sprite.RenderPlain((alien, obstacle))
+    allsprites = pygame.sprite.RenderPlain((alien,obstacles))
     clock = pygame.time.Clock()
     keydown = False
+
 
     # Set the variable for the alien's default position
     alienHome = game.screen.get_height()-(alien.rect.height/2)-10
@@ -95,7 +109,14 @@ class GameEngine:
         if event.type == KEYUP:
           keydown = False
           alien.sound.fadeout(200)
-      obstacle.move()
+      print len(obstacles)
+      for obstacle in obstacles:
+        checkStillThere = obstacle.move()
+        if not checkStillThere:
+          obstacles.remove(obstacle)
+          obstacles.append(Obstacle((self.width,self.height/2)))
+          allsprites = pygame.sprite.RenderPlain((alien,obstacles))
+          checkStillThere = True
 
 
       # This piece of logic deals with the gravity of the game.
