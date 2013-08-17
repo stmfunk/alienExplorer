@@ -103,8 +103,6 @@ class GameEngine:
           sys.exit(0)
         if event.type == KEYDOWN:
           if event.dict['key'] == 32:
-            alien.thrusters()
-            alien.sound.play(-1)
             keydown = True
         if event.type == KEYUP:
           keydown = False
@@ -131,7 +129,12 @@ class GameEngine:
           modeDis = 0
         alien.move(0,moveDis)
       elif keydown:
-        alien.move(0,-3)
+        # Now to create a ceiling so our alien can't fly home 
+        # in this level.
+        if alien.rect.top >= 0:
+          alien.thrusters()
+          alien.sound.play(-1)
+
 
 
       # Update the images on screen ensure they
