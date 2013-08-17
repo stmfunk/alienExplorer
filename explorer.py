@@ -2,7 +2,7 @@
 # AUTHOR:     stm
 # DATE:       23/06/13
 # PROJECT:    explorer.py
-# Version:    0.2
+# Version:    0.3
 #######################
 
 # Imports
@@ -20,7 +20,7 @@ class Obstacle(pygame.sprite.Sprite):
     move from right to left, as all of our
     player interacting objects behave in
     this way.'''
-  def __init__(self, scale=2, zLevel=0, location, image="resources/Cloud.bmp"):
+  def __init__(self, location, scale=2, zLevel=0,image="resources/Cloud.bmp"):
     pygame.sprite.Sprite.__init__(self)
     temp = game.load_image(image, -1)
     temp = (pygame.transform.scale(temp[0],(temp[0].get_width()/scale,temp[0].get_height()/scale)), temp[1])
@@ -44,7 +44,7 @@ class Alien(pygame.sprite.Sprite):
     self.screen = pygame.display.get_surface()
     self.area = self.screen.get_rect()
     self.rect.center = (self.rect.width/2+10, game.screen.get_height()-(self.rect.height/2)-10) 
-    self.sound = game.load_sound('../../../supportFiles/sounds/rocket.wav')
+    self.sound = game.load_sound('../../supportFiles/sounds/rocket.wav')
     self.sound.set_volume(0.5)
 
   def thrusters(self): 
@@ -109,7 +109,6 @@ class GameEngine:
         if event.type == KEYUP:
           keydown = False
           alien.sound.fadeout(200)
-      print len(obstacles)
       for obstacle in obstacles:
         checkStillThere = obstacle.move()
         if not checkStillThere:
