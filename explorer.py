@@ -10,6 +10,7 @@ import sys
 import pygame
 import os
 from pygame.locals import *
+import random
 
 class Obstacle(pygame.sprite.Sprite):
   '''This is a generic class for building
@@ -20,18 +21,19 @@ class Obstacle(pygame.sprite.Sprite):
     move from right to left, as all of our
     player interacting objects behave in
     this way.'''
-  def __init__(self, location, scale=2, zLevel=0,image="resources/Cloud.bmp"):
+  def __init__(self, location, scale=2,speed=3,image="resources/Cloud.bmp"):
     pygame.sprite.Sprite.__init__(self)
     temp = game.load_image(image, -1)
     temp = (pygame.transform.scale(temp[0],(temp[0].get_width()/scale,temp[0].get_height()/scale)), temp[1])
     self.image, self.rect = temp
     self.rect = self.image.get_rect()
     self.rect.center = location
+    self.speed = speed
 
   def move(self):
     if self.rect.center[0] < -(self.rect.width) or self.rect.center[1] < -(self.rect.height):
       return False
-    self.rect.center = (self.rect.center[0]-3,self.rect.center[1])
+    self.rect.center = (self.rect.center[0]-self.speed,self.rect.center[1])
     return True
 
 
@@ -70,20 +72,19 @@ class GameEngine:
     # Initiate the game 
     pygame.init()
     self.screen = pygame.display.set_mode((self.width, self.height))
-    pygame.display.set_caption('Move the monkey')
+    pygame.display.set_caption('Capture the White House')
     pygame.mouse.set_visible(1)
     background = pygame.Surface(self.screen.get_size())
     background = background.convert()
   
     # Drawing the screen and the background
     # also the sprite
-    background.fill((200,200,200))
+    background.fill((100,100,250))
     self.screen.blit(background, (0,0))
     pygame.display.flip()
 
     # Create the obstacles
     obstacles = []
-    obstacles.append(Obstacle((self.width,self.height/2)))
 
     alien = Alien()
     allsprites = pygame.sprite.RenderPlain((alien,obstacles))
@@ -107,14 +108,9 @@ class GameEngine:
         if event.type == KEYUP:
           keydown = False
           alien.sound.fadeout(200)
-      for obstacle in obstacles:
-        checkStillThere = obstacle.move()
-        if not checkStillThere:
-          obstacles.remove(obstacle)
-          obstacles.append(Obstacle((self.width,self.height/2)))
-          allsprites = pygame.sprite.RenderPlain((alien,obstacles))
-          checkStillThere = True
-
+      obstacles = self.random_environment(0,obstacles)
+      allsprites = pygame.sprite.RenderPlain((alien,obstacles))
+     
 
       # This piece of logic deals with the gravity of the game.
       # When the key is not pressed i.e. when thrusters are 
@@ -134,8 +130,6 @@ class GameEngine:
         if alien.rect.top >= 0:
           alien.thrusters()
           alien.sound.play(-1)
-
-
 
       # Update the images on screen ensure they
       # also persist
@@ -170,6 +164,18 @@ class GameEngine:
       sys.stderr.write('Cannot open file',wav)
       raise SystemExit, message
     return sound
+
+  def random_environment(self,mode, obstacles):
+    variable = random.randrange(0,1000);
+    if (variable > 994 and len(obstacles) < 5) or len(obstacles) < 1:
+      obstacles.append(Obstacle((700,35+random.randrange(0,10)),speed=random.randrange(2,4)))
+    for obstacle in obstacles:
+      checkStillThere = obstacle.move()
+      if not checkStillThere:
+        obstacles.remove(obstacle)
+        checkStillThere = True
+    return obstacles
+
 
 
 
