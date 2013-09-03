@@ -174,8 +174,11 @@ class GameEngine:
 
   def random_environment(self,mode, obstacles):
     variable = random.randrange(0,1000);
+    whichObst = random.randrange(0,2);
+    obst = [("resources/Cloud.bmp",2,35+random.randrange(0,10), random.randrange(2,4)),("resources/aTree.bmp",3,320-random.randrange(0,10),2)]
+    curObst = obst[whichObst]
     if (variable > 994 and len(obstacles) < 5) or len(obstacles) < 1:
-      obstacles.append(Obstacle((700,35+random.randrange(0,10)),speed=random.randrange(2,4)))
+      obstacles.append(Obstacle((700,curObst[2]),scale=curObst[1],speed=curObst[3], image=curObst[0]))
     for obstacle in obstacles:
       checkStillThere = obstacle.move()
       if not checkStillThere:
