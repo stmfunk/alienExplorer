@@ -1,6 +1,9 @@
 # C extensions
 *.so
 
+# XML Files
+*.xml
+
 # Packages
 *.egg
 *.egg-info
