@@ -49,12 +49,17 @@ class Alien(pygame.sprite.Sprite):
     self.rect.center = (self.rect.width/2+10, game.screen.get_height()-(self.rect.height/2)-10) 
     self.sound = game.load_sound('../../supportFiles/sounds/rocket.wav')
     self.sound.set_volume(0.5)
+    self.bobTo = 2
 
   def thrusters(self): 
       self.move(0, -3)
 
   def move(self, dx, dy):
     self.rect = self.rect.move(dx, dy)
+
+  def bob(self):
+    self.bobTo = -self.bobTo
+    self.move(0,self.bobTo)
 
 class GameEngine:
   '''This is the game engine.
@@ -100,7 +105,7 @@ class GameEngine:
 
     # Set the variable for the alien's default position
     alienHome = game.screen.get_height()-(alien.rect.height/2)-10
-
+    bobyet = 0
     # Event loop to keep track of
     # what is happening
     while True:
@@ -139,6 +144,10 @@ class GameEngine:
 
       # Update the images on screen ensure they
       # also persist
+      bobyet += 1
+      if bobyet == 10:
+        alien.bob()
+        bobyet = 0
       allsprites.update()
       self.screen.blit(background, (0,0))
       self.screen.blit(ground,(0,380))
