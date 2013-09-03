@@ -75,13 +75,18 @@ class GameEngine:
     self.screen = pygame.display.set_mode((self.width, self.height))
     pygame.display.set_caption('Capture the White House')
     pygame.mouse.set_visible(1)
+    ground = pygame.Surface((self.screen.get_size()[0],self.screen.get_size()[1]/20))
     background = pygame.Surface(self.screen.get_size())
     background = background.convert()
+    ground = ground.convert()
   
     # Drawing the screen and the background
     # also the sprite
+
     background.fill((100,100,250))
+    ground.fill((0,200,0))
     self.screen.blit(background, (0,0))
+    self.screen.blit(ground,(0,380))
     pygame.display.flip()
 
     # Create the obstacles
@@ -136,6 +141,7 @@ class GameEngine:
       # also persist
       allsprites.update()
       self.screen.blit(background, (0,0))
+      self.screen.blit(ground,(0,380))
       allsprites.draw(self.screen)
       pygame.display.flip()
 
