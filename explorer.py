@@ -104,7 +104,7 @@ class GameEngine:
 
 
     # Set the variable for the alien's default position
-    alienHome = game.screen.get_height()-(alien.rect.height/2)-10
+    alienHome = game.screen.get_height()-(alien.rect.height/2)-25
     bobyet = 0
     # Event loop to keep track of
     # what is happening
